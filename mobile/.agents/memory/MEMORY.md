@@ -1,0 +1,3 @@
+- [Flutter GTMS app architecture](gtms-arch.md) — offline-first Flutter app; full SQLite persistence via LocalDataStore + DatabaseHelper singleton; seed data on first run via LocalSeedData.
+- [Flutter path_provider SDK pin](gtms-deps.md) — path_provider must stay at 2.1.5 (not 2.1.6+) because Dart SDK on this Replit is 3.8.0 and 2.1.6 requires ^3.10.0.
+- [GTMS production upgrade](gtms-upgrade.md) — all 12 stubbed features replaced with real SQLite-backed implementations; fingerprint replaced with National ID text field; sequence IDs from DB; auto-sync on connectivity; real sync history.
