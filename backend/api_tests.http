@@ -1,0 +1,89 @@
+### 0. Health Check
+GET http://localhost:5000/api/v1/health
+
+### 1. Login System Administrator (Save token variable)
+# @name login
+POST http://localhost:5000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@nasfam.mw",
+  "password": "Admin@123"
+}
+
+### Store token from login response
+@authToken = {{login.response.body.data.accessToken}}
+
+### 2. Get Authenticated User Profile
+GET http://localhost:5000/api/v1/auth/me
+Authorization: Bearer {{authToken}}
+
+### 3. Get System Roles (Get Role ID for User Creation)
+# @name roles
+GET http://localhost:5000/api/v1/admin/roles
+Authorization: Bearer {{authToken}}
+
+@warehouseRoleId = {{roles.response.body.data[1].id}}
+
+### 4. Create New User Account (Triggers Automated Credentials Email Dispatch!)
+POST http://localhost:5000/api/v1/admin/users
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Isaac Officer",
+  "email": "warehouse.officer@nasfam.mw",
+  "phone": "+265 999 111 222",
+  "password": "Officer@Pass2026",
+  "roleId": "{{warehouseRoleId}}",
+  "status": "ACTIVE"
+}
+
+### 5. Get Farmers List (Paginated)
+GET http://localhost:5000/api/v1/farmers?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### 6. Create New Farmer Record
+POST http://localhost:5000/api/v1/farmers
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "firstName": "Chikondi",
+  "lastName": "Banda",
+  "gender": "FEMALE",
+  "phoneNumber": "+265 991 234 567",
+  "district": "Lilongwe",
+  "village": "Mphande 1",
+  "farmSize": 2.5,
+  "primaryCrops": ["Maize", "Groundnuts"],
+  "seedLoanBalance": 2500
+}
+
+### 7. Get Master Commodities
+GET http://localhost:5000/api/v1/master-data/commodities
+Authorization: Bearer {{authToken}}
+
+### 8. Get Purchases List
+GET http://localhost:5000/api/v1/purchases
+Authorization: Bearer {{authToken}}
+
+### 9. Trace Grain Lineage (Search by Receipt Number)
+GET http://localhost:5000/api/v1/traceability/trace?code=RCP-2026-0001
+Authorization: Bearer {{authToken}}
+
+### 10. Push Mobile Offline Batch Data Sync
+POST http://localhost:5000/api/v1/sync/push
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "deviceId": "mobile-dev-001",
+  "farmers": [],
+  "farms": [],
+  "purchases": []
+}
+
+### 11. Get System Summary Analytics Report
+GET http://localhost:5000/api/v1/reports/summary
+Authorization: Bearer {{authToken}}

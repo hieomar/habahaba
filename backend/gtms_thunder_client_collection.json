@@ -1,0 +1,92 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "NASFAM GTMS Backend API Collection",
+  "collectionId": "gtms-api-collection-2026",
+  "dateExported": "2026-07-31T00:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    { "id": "f_auth", "name": "1. Authentication" },
+    { "id": "f_farmers", "name": "2. Farmer Management" },
+    { "id": "f_farms", "name": "3. Farm Management" },
+    { "id": "f_purchases", "name": "4. Commodity Purchasing" },
+    { "id": "f_grns", "name": "5. GRN Receiving" },
+    { "id": "f_batches", "name": "6. Batch Management" },
+    { "id": "f_inventory", "name": "7. Inventory Stock" },
+    { "id": "f_dispatches", "name": "8. Dispatch & Waybill" },
+    { "id": "f_traceability", "name": "9. Traceability Intelligence" },
+    { "id": "f_sync", "name": "10. Mobile Offline Sync" },
+    { "id": "f_admin", "name": "11. User & Role Admin" },
+    { "id": "f_master", "name": "12. Master Data & Reports" }
+  ],
+  "requests": [
+    {
+      "name": "Health Check",
+      "url": "http://localhost:5000/api/v1/health",
+      "method": "GET"
+    },
+    {
+      "name": "Login System Administrator",
+      "folderId": "f_auth",
+      "url": "http://localhost:5000/api/v1/auth/login",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"admin@nasfam.mw\",\n  \"password\": \"Admin@123\"\n}"
+      }
+    },
+    {
+      "name": "Get Authenticated User Profile (/me)",
+      "folderId": "f_auth",
+      "url": "http://localhost:5000/api/v1/auth/me",
+      "method": "GET"
+    },
+    {
+      "name": "Get Farmers List (Paginated)",
+      "folderId": "f_farmers",
+      "url": "http://localhost:5000/api/v1/farmers?page=1&limit=10",
+      "method": "GET"
+    },
+    {
+      "name": "Create Farmer Record",
+      "folderId": "f_farmers",
+      "url": "http://localhost:5000/api/v1/farmers",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"firstName\": \"Chikondi\",\n  \"lastName\": \"Banda\",\n  \"gender\": \"FEMALE\",\n  \"phoneNumber\": \"+265 991 234 567\",\n  \"nationalId\": \"P12345678\",\n  \"district\": \"Lilongwe\",\n  \"village\": \"Mphande 1\",\n  \"farmSize\": 2.5,\n  \"primaryCrops\": [\"Maize\", \"Groundnuts\"],\n  \"seedLoanBalance\": 2500\n}"
+      }
+    },
+    {
+      "name": "Create Commodity Purchase",
+      "folderId": "f_purchases",
+      "url": "http://localhost:5000/api/v1/purchases",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"farmerId\": \"<FARMER_ID>\",\n  \"commodityId\": \"<COMMODITY_ID>\",\n  \"buyingCentre\": \"Lilongwe Buying Centre\",\n  \"quantityKg\": 200,\n  \"pricePerKg\": 75,\n  \"paymentStatus\": \"PAID\",\n  \"paymentMethod\": \"CASH\"\n}"
+      }
+    },
+    {
+      "name": "Trace Grain Lineage (Search)",
+      "folderId": "f_traceability",
+      "url": "http://localhost:5000/api/v1/traceability/trace?code=RCP-2026-0001",
+      "method": "GET"
+    },
+    {
+      "name": "Push Mobile Offline Sync Batch",
+      "folderId": "f_sync",
+      "url": "http://localhost:5000/api/v1/sync/push",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"deviceId\": \"mobile-dev-001\",\n  \"farmers\": [],\n  \"farms\": [],\n  \"purchases\": []\n}"
+      }
+    },
+    {
+      "name": "Get System Summary Report",
+      "folderId": "f_master",
+      "url": "http://localhost:5000/api/v1/reports/summary",
+      "method": "GET"
+    }
+  ]
+}

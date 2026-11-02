@@ -1,0 +1,449 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RoleType {
+  SYSADMIN
+  WAREHOUSE_OFFICER
+  IPC_MANAGER
+  HEAD_OFFICE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Status {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  INACTIVE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY_TNMPAMBA
+  AIRTEL_MONEY
+  BANK_TRANSFER
+  CASH
+}
+
+enum BatchStatus {
+  ACTIVE
+  PROCESSING
+  STORED
+  DISPATCHED
+}
+
+enum DispatchStatus {
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum MobileSyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+}
+
+model User {
+  id            String      @id @default(uuid())
+  name          String
+  email         String      @unique
+  phone         String?
+  passwordHash  String
+  roleId        String
+  role          Role        @relation(fields: [roleId], references: [id])
+  assignedIpcId String?
+  assignedIpc   IPC?        @relation(fields: [assignedIpcId], references: [id])
+  status        Status      @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  purchases     Purchase[]  @relation("PurchasingOfficer")
+  grns          GRN[]       @relation("ReceivingOfficer")
+  dispatches    Dispatch[]  @relation("DispatchedByOfficer")
+  auditLogs     AuditLog[]
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  code        RoleType     @unique
+  description String?      @db.Text
+  users       User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id         String   @id @default(uuid())
+  roleId     String
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  moduleName String
+  canCreate  Boolean  @default(false)
+  canRead    Boolean  @default(true)
+  canUpdate  Boolean  @default(false)
+  canDelete  Boolean  @default(false)
+  canExport  Boolean  @default(false)
+  canApprove Boolean  @default(false)
+
+  @@unique([roleId, moduleName])
+}
+
+model IPC {
+  id               String            @id @default(uuid())
+  code             String            @unique
+  name             String
+  district         String
+  region           String
+  status           Status            @default(ACTIVE)
+  establishedDate  DateTime?
+  users            User[]
+  warehouses       Warehouse[]
+  marketingCentres MarketingCentre[]
+  associations     Association[]
+  farmers          Farmer[]
+  purchases        Purchase[]
+  batches          Batch[]
+}
+
+model Warehouse {
+  id             String          @id @default(uuid())
+  code           String          @unique
+  name           String
+  ipcId          String
+  ipc            IPC             @relation(fields: [ipcId], references: [id])
+  district       String
+  location       String
+  capacityMT     Float
+  status         Status          @default(ACTIVE)
+  gpsLat         Float?
+  gpsLng         Float?
+  inventories    Inventory[]
+  batches        Batch[]
+  grns           GRN[]
+  dispatchesFrom Dispatch[]      @relation("SourceWarehouse")
+  stockMovements StockMovement[]
+}
+
+model MarketingCentre {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  name          String
+  district      String
+  ipcId         String
+  ipc           IPC          @relation(fields: [ipcId], references: [id])
+  associationId String?
+  association   Association? @relation(fields: [associationId], references: [id])
+  gpsLat        Float?
+  gpsLng        Float?
+  status        Status       @default(ACTIVE)
+}
+
+model Association {
+  id               String            @id @default(uuid())
+  code             String            @unique
+  name             String
+  ipcId            String
+  ipc              IPC               @relation(fields: [ipcId], references: [id])
+  district         String
+  chairperson      String?
+  clubs            Club[]
+  farmers          Farmer[]
+  marketingCentres MarketingCentre[]
+}
+
+model Club {
+  id            String      @id @default(uuid())
+  code          String      @unique
+  name          String
+  associationId String
+  association   Association @relation(fields: [associationId], references: [id])
+  secretary     String?
+  farmers       Farmer[]
+}
+
+model Farmer {
+  id                  String           @id @default(uuid())
+  uuid                String?          @unique
+  farmerCode          String           @unique
+  firstName           String
+  lastName            String
+  fullName            String
+  gender              Gender
+  dob                 DateTime?
+  phone               String?
+  altPhone            String?
+  nationalId          String?          @unique
+  district            String
+  ta                  String?
+  epa                 String?
+  section             String?
+  village             String
+  gps                 String?
+  latitude            Float?
+  longitude           Float?
+  ipcId               String?
+  ipc                 IPC?             @relation(fields: [ipcId], references: [id])
+  associationId       String?
+  association         Association?     @relation(fields: [associationId], references: [id])
+  clubId              String?
+  club                Club?            @relation(fields: [clubId], references: [id])
+  groupName           String?
+  memberNo            String?
+  farmSize            Float
+  unit                String           @default("Hectares")
+  cropsJson           String?          @db.Text
+  productionSeason    String?
+  registrationDate    DateTime         @default(now())
+  registrationOfficer String?
+  seedLoanBalance     Float            @default(0)
+  status              Status           @default(ACTIVE)
+  syncStatus          MobileSyncStatus @default(SYNCED)
+  photoUrl            String?
+  farms               Farm[]
+  purchases           Purchase[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+}
+
+model Farm {
+  id                   String           @id @default(uuid())
+  uuid                 String?          @unique
+  farmerId             String
+  farmer               Farmer           @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  farmName             String
+  location             String
+  district             String?
+  village              String?
+  sizeHectares         Float
+  gpsLat               Float?
+  gpsLng               Float?
+  primaryCrop          String
+  secondaryCrop        String?
+  season               String?
+  productionEstimateKg Float?
+  soilType             String?
+  irrigated            Boolean          @default(false)
+  lastVisit            DateTime?
+  extensionNotes       String?          @db.Text
+  status               Status           @default(ACTIVE)
+  syncStatus           MobileSyncStatus @default(SYNCED)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model Commodity {
+  id          String      @id @default(uuid())
+  code        String      @unique
+  name        String
+  unit        String      @default("kg")
+  minGradeKg  Float?
+  maxGradeKg  Float?
+  status      Status      @default(ACTIVE)
+  purchases   Purchase[]
+  batches     Batch[]
+  inventories Inventory[]
+}
+
+model Purchase {
+  id                  String           @id @default(uuid())
+  uuid                String?          @unique
+  receiptNumber       String           @unique
+  purchaseDate        DateTime         @default(now())
+  buyingCentre        String
+  ipcId               String
+  ipc                 IPC              @relation(fields: [ipcId], references: [id])
+  purchasingOfficerId String?
+  purchasingOfficer   User?            @relation("PurchasingOfficer", fields: [purchasingOfficerId], references: [id])
+  farmerId            String
+  farmer              Farmer           @relation(fields: [farmerId], references: [id])
+  commodityId         String
+  commodity           Commodity        @relation(fields: [commodityId], references: [id])
+  variety             String?
+  grade               String?
+  qualityGrade        String?
+  numberOfBags        Int
+  bagWeight           Float            @default(50)
+  totalWeight         Float
+  unitPrice           Float
+  grossAmount         Float
+  seedLoanDeduction   Float            @default(0)
+  otherDeductions     Float            @default(0)
+  netPayable          Float
+  paymentStatus       PaymentStatus    @default(PENDING)
+  paymentMethod       PaymentMethod?
+  paymentDate         DateTime?
+  paymentReference    String?
+  purchaseNotes       String?          @db.Text
+  bagTagRange         String?
+  syncStatus          MobileSyncStatus @default(SYNCED)
+  grns                GRN[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+}
+
+model GRN {
+  id                     String     @id @default(uuid())
+  grnNumber              String     @unique
+  purchaseId             String?
+  purchase               Purchase?  @relation(fields: [purchaseId], references: [id])
+  warehouseId            String
+  warehouse              Warehouse  @relation(fields: [warehouseId], references: [id])
+  receivingOfficerId     String?
+  receivingOfficer       User?      @relation("ReceivingOfficer", fields: [receivingOfficerId], references: [id])
+  receivingDate          DateTime   @default(now())
+  grossWeight            Float
+  tareWeight             Float
+  netWeight              Float
+  moistureContentPercent Float?
+  acceptedQuantity       Float
+  rejectedQuantity       Float      @default(0)
+  rejectionReason        String?    @db.Text
+  batchGRNs              BatchGRN[]
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+}
+
+model Batch {
+  id              String      @id @default(uuid())
+  batchNumber     String      @unique
+  warehouseId     String
+  warehouse       Warehouse   @relation(fields: [warehouseId], references: [id])
+  ipcId           String
+  ipc             IPC         @relation(fields: [ipcId], references: [id])
+  commodityId     String
+  commodity       Commodity   @relation(fields: [commodityId], references: [id])
+  numberOfBags    Int
+  totalWeightKg   Float
+  storageLocation String
+  status          BatchStatus @default(ACTIVE)
+  notes           String?     @db.Text
+  createdAt       DateTime    @default(now())
+  createdBy       String
+  batchGRNs       BatchGRN[]
+  dispatches      Dispatch[]
+}
+
+model BatchGRN {
+  batchId String
+  batch   Batch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  grnId   String
+  grn     GRN    @relation(fields: [grnId], references: [id], onDelete: Cascade)
+
+  @@id([batchId, grnId])
+}
+
+model Inventory {
+  id                 String    @id @default(uuid())
+  warehouseId        String
+  warehouse          Warehouse @relation(fields: [warehouseId], references: [id])
+  commodityId        String
+  commodity          Commodity @relation(fields: [commodityId], references: [id])
+  currentStockKg     Float     @default(0)
+  numberOfBags       Int       @default(0)
+  capacityKg         Float
+  utilizationPercent Float     @default(0)
+  lastUpdated        DateTime  @updatedAt
+
+  @@unique([warehouseId, commodityId])
+}
+
+model StockMovement {
+  id          String    @id @default(uuid())
+  type        String
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  commodity   String
+  quantityKg  Float
+  reference   String
+  date        DateTime  @default(now())
+  officer     String
+}
+
+model Customer {
+  id         String     @id @default(uuid())
+  code       String     @unique
+  name       String
+  type       String
+  contact    String
+  address    String
+  status     Status     @default(ACTIVE)
+  dispatches Dispatch[]
+}
+
+model Dispatch {
+  id              String         @id @default(uuid())
+  dispatchNumber  String         @unique
+  customerId      String?
+  customer        Customer?      @relation(fields: [customerId], references: [id])
+  warehouseId     String
+  warehouse       Warehouse      @relation("SourceWarehouse", fields: [warehouseId], references: [id])
+  batchId         String
+  batch           Batch          @relation(fields: [batchId], references: [id])
+  numberOfBags    Int
+  quantityKg      Float
+  dispatchDate    DateTime       @default(now())
+  deliveryAddress String
+  vehicleReg      String
+  driverName      String
+  dispatchedById  String?
+  dispatchedBy    User?          @relation("DispatchedByOfficer", fields: [dispatchedById], references: [id])
+  status          DispatchStatus @default(IN_TRANSIT)
+  receivedBy      String?
+  receivedDate    DateTime?
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+}
+
+model MobileSyncLog {
+  id           String   @id @default(uuid())
+  deviceId     String
+  userId       String?
+  syncType     String
+  recordsCount Int
+  status       String
+  errorMessage String?  @db.Text
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  timestamp DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userName  String
+  action    String
+  module    String
+  recordId  String?
+  ipAddress String?
+  details   String?  @db.Text
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  title     String
+  message   String   @db.Text
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String @db.Text
+}

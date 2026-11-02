@@ -1,0 +1,244 @@
+{
+  "info": {
+    "name": "NASFAM GTMS Backend API Collection",
+    "description": "Complete Postman API Collection for NASFAM GTMS Backend REST API including Email Credentials Dispatch",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "health"]
+        }
+      }
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@nasfam.mw\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User & Role Administration",
+      "item": [
+        {
+          "name": "Get Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/admin/roles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "admin", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Create User (Triggers Email Dispatch)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Isaac Officer\",\n  \"email\": \"warehouse.officer@nasfam.mw\",\n  \"phone\": \"+265 999 111 222\",\n  \"password\": \"Officer@Pass2026\",\n  \"roleId\": \"<ROLE_ID>\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/admin/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "admin", "users"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Farmer Management",
+      "item": [
+        {
+          "name": "Get Farmers List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/farmers?page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "farmers"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Farmer Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Chikondi\",\n  \"lastName\": \"Banda\",\n  \"gender\": \"FEMALE\",\n  \"phoneNumber\": \"+265 991 234 567\",\n  \"district\": \"Lilongwe\",\n  \"village\": \"Mphande 1\",\n  \"farmSize\": 2.5,\n  \"primaryCrops\": [\"Maize\", \"Groundnuts\"],\n  \"seedLoanBalance\": 2500\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/farmers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "farmers"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Commodity Purchasing",
+      "item": [
+        {
+          "name": "Get Purchases List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/purchases?page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "purchases"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Traceability Lineage",
+      "item": [
+        {
+          "name": "Trace Grain Lineage",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/traceability/trace?code=RCP-2026-0001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "traceability", "trace"],
+              "query": [
+                { "key": "code", "value": "RCP-2026-0001" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Mobile Offline Sync",
+      "item": [
+        {
+          "name": "Push Mobile Sync Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"mobile-dev-001\",\n  \"farmers\": [],\n  \"farms\": [],\n  \"purchases\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/sync/push",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "sync", "push"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Master Data & Reports",
+      "item": [
+        {
+          "name": "Get System Summary Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/reports/summary",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "v1", "reports", "summary"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
