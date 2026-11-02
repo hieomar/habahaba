@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────
+   Design Tokens – Light Mode (default)
+   Primary green: #1a5c2a  (NASFAM brand green)
+   ───────────────────────────────────────────── */
+:root {
+  /* ── Brand ── */
+  --brand-green:        #1a5c2a;
+  --brand-green-dark:   #134520;
+  --brand-green-light:  #e8f1ea;
+  --brand-green-mid:    #2a7a3b;
+
+  /* ── Neutral scale (light) ── */
+  --gray-50:   #f9fafb;
+  --gray-100:  #f3f4f6;
+  --gray-200:  #e5e7eb;
+  --gray-300:  #d1d5db;
+  --gray-400:  #9ca3af;
+  --gray-500:  #6b7280;
+  --gray-600:  #4b5563;
+  --gray-700:  #374151;
+  --gray-800:  #1f2937;
+  --gray-900:  #111827;
+
+  /* ── Surfaces ── */
+  --surface-page:    #f9fafb;   /* page / main bg */
+  --surface-card:    #ffffff;   /* card, panel bg */
+  --surface-subtle:  #f9fafb;   /* slight off-white bg */
+  --surface-input:   #f9fafb;   /* input / select bg */
+  --surface-hover:   #f3f4f6;   /* hover state */
+  --surface-header:  #ffffff;   /* topbar bg */
+  --surface-overlay: #ffffff;   /* dropdown / modal bg */
+
+  /* ── Borders ── */
+  --border-default:  #e5e7eb;
+  --border-subtle:   #f3f4f6;
+
+  /* ── Text ── */
+  --text-primary:    #111827;
+  --text-secondary:  #4b5563;
+  --text-muted:      #9ca3af;
+  --text-inverted:   #ffffff;
+
+  /* ── Focus ring ── */
+  --focus-ring: 0 0 0 3px rgba(26, 92, 42, 0.25);
+
+  /* ── Typography ── */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* ── Aliases kept for Tailwind @theme ── */
+  --nasfam-green:        var(--brand-green);
+  --nasfam-green-dark:   var(--brand-green-dark);
+  --nasfam-green-light:  var(--brand-green-light);
+  --nasfam-green-mid:    var(--brand-green-mid);
+}
+
+/* ─────────────────────────────────────────────
+   Design Tokens – Dark Mode
+   Simply override the same variables here.
+   Everything that references a var() updates automatically.
+   ───────────────────────────────────────────── */
+html.dark {
+  color-scheme: dark;
+
+  /* ── Surfaces ── */
+  --surface-page:    #1a1a1a;   /* main background */
+  --surface-card:    #252525;   /* cards & panels */
+  --surface-subtle:  #1e1e1e;
+  --surface-input:   #252525;   /* input / select bg */
+  --surface-hover:   #2e2e2e;   /* hover state */
+  --surface-header:  #1a1a1a;   /* topbar */
+  --surface-overlay: #252525;   /* dropdowns / modals */
+
+  /* ── Borders ── */
+  --border-default:  #333333;
+  --border-subtle:   #2a2a2a;
+
+  /* ── Text ── */
+  --text-primary:    #f8fafc;
+  --text-secondary:  #cbd5e1;
+  --text-muted:      #94a3b8;
+  --text-inverted:   #000000;
+}
+
+@theme inline {
+  --color-nasfam-green:       var(--brand-green);
+  --color-nasfam-green-dark:  var(--brand-green-dark);
+  --color-nasfam-green-light: var(--brand-green-light);
+  --color-nasfam-green-mid:   var(--brand-green-mid);
+  --font-sans:                var(--font-sans);
+}
+
+/* ─────────────────────────────────────────────
+   Chart animations
+   ───────────────────────────────────────────── */
+@keyframes chartFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* Vertical bar: grows from the bottom baseline upward */
+@keyframes barGrowUp {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Horizontal bar: extends from the left edge */
+@keyframes barSlideIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ─────────────────────────────────────────────
+   Scrollbar Customization
+   ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+
+/* ─────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background-color: var(--surface-page);
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  background-color: var(--surface-page);
+}
+
+/* ─────────────────────────────────────────────
+   Tailwind class overrides for dark mode
+   (applies var() tokens to Tailwind utility classes)
+   ───────────────────────────────────────────── */
+html.dark body,
+html.dark main {
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+}
+
+html.dark .bg-white {
+  background-color: var(--surface-card) !important;
+  border-color: #333333 !important;
+}
+
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: var(--surface-subtle) !important;
+}
+
+html.dark .text-gray-900 { color: var(--text-primary)   !important; }
+html.dark .text-gray-800 { color: var(--text-primary)   !important; }
+html.dark .text-gray-700 { color: var(--text-secondary) !important; }
+html.dark .text-gray-600 { color: var(--text-secondary) !important; }
+html.dark .text-gray-500 { color: var(--text-muted)     !important; }
+html.dark .text-gray-400 { color: var(--text-muted)     !important; }
+
+html.dark .bg-gray-200 {
+  background-color: #222222 !important;
+}
+
+html.dark .bg-gray-300 {
+  background-color: #222222 !important;
+}
+
+html.dark .hover\:bg-gray-200:hover {
+  background-color: #222222 !important;
+}
+
+html.dark .hover\:bg-gray-300:hover {
+  background-color: #222222 !important;
+}
+
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: var(--border-default) !important;
+}
+
+/* ─────────────────────────────────────────────
+   Focus visible – accessible, on-brand
+   ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 2px;
+}
